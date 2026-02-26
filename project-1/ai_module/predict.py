@@ -18,7 +18,7 @@ if st.button("Predict"):
     prediction = load_model.predict(np.array([[enter]]))
     st.success(f"Prediction Marks: {prediction[0]:.2f}")
 
-# # Load model
+# Load model
 # with open("../models/model.pkl","rb") as f:
 #     loaded_model = pickle.load(f)
 
