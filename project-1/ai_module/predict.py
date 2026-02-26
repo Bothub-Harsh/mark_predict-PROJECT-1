@@ -1,11 +1,24 @@
 import pickle
 import numpy as np
+import streamlit as st 
 
-# Load model
-with open("../models/model.pkl", "rb") as f:
-    model = pickle.load(f)
+load_model=pickle.load(open("../models/model.pkl","rb"))
 
-hours = float(input("Enter study hours: "))
-prediction = model.predict(np.array([[hours]]))
+st.title("📊 Student Marks Predictor")
+st.write("Enter study hours to predict marks")
 
-print(f"Predicted Marks: {prediction[0]}")
+enter = st.text_input("Enter Hours Studied")
+
+if st.button("predict"):
+    prediction = load_model.predict([[enter]])
+    st.success(f"prediction marks: {prediction}")
+
+# # Load model
+# with open("../models/model.pkl","rb") as f:
+#     loaded_model = pickle.load(f)
+
+# enter = int(input("Enter your hour: "))
+# pred = loaded_model.predict([[enter]])
+# print(f"Prediction for {enter} hours:", pred)
+
+

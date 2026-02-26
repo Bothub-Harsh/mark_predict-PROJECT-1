@@ -1,77 +1,29 @@
 import pandas as pd
-import numpy as np
-import pickle
-import matplotlib.pyplot as plt
-from sklearn.pipeline import make_pipeline
-from sklearn.preprocessing import PolynomialFeatures
-from sklearn.linear_model import LinearRegression
+import pickle 
+import os
+from regression_model import train_model , evaluation_model , tune_model
 
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-
-
-# Load dataset
 df = pd.read_csv("../data/student_data.csv")
 
 X = df[["Hours"]]
 y = df["Marks"]
 
-# Split data
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=101
-)
+#train
+model = train_model(X, y, degree=3, alpha=1)
+# model, best_params, best_score = tune_model(X, y)
 
-# Train model
-model = make_pipeline(
-    PolynomialFeatures(degree=2),
-    LinearRegression()
-    )
+os.makedirs("../models",exist_ok=True)
 
-model.fit(X_train, y_train)
+with open("../models/model.pkl","wb") as f:
+    pickle.dump(model,f)
 
-# Predictions
-predictions = model.predict(X_test)
+# Evaluate
+results = evaluation_model(model , X , y)
 
-# Assume you already have:
-# X = array of hours studied (like [2.5, 3.1, 5.0, ...])
-# y = array of marks          (like [55, 62, 78, ...])
-# model = some trained model (LinearRegression, etc.)
+print("best parameter:",best_params)
+print("best score:",best_score)
+print("Fold Scores:", results["scores"])
+print("Mean R2:", results["mean_r2"])
+print("Std R2:", results["std_r2"])
 
-# Step 1: Create 100 smooth points between min and max hours
-X_range = np.linspace( X["Hours"].min(), X["Hours"].max(), 100 )
-
-# Step 2: Very important: sklearn expects 2D input → shape (n_samples, 1)
-X_range = X_range.reshape(-1, 1)          # now shape is (100, 1)
-
-# Step 3: Ask model to predict marks for these 100 smooth hours
-y_range = model.predict(X_range)
-
-# Evaluation
-mae = mean_absolute_error(y_test, predictions)
-mse = mean_squared_error(y_test, predictions)
-r2 = r2_score(y_test, predictions)
-rmse = np.sqrt(mse)
-residuals = y_test - predictions    # Residual = actual - predicated
-
-# Blue = real data
-# Red = model line
-plt.scatter(X, y, color="blue")
-plt.plot(X_range, y_range, color="red")
-plt.xlabel("Hours")
-plt.ylabel("Marks")
-plt.title("Regression Line")
-
-
-print("Model Evaluation")
-print("----------------")
-print("Residuals:", residuals.head())
-print("RMSE:", rmse)
-print("MAE:", mae)
-print("MSE:", mse)
-print("R2 Score:", r2)
-
-plt.show()
-
-
-
-
+print("model train successfully.")
