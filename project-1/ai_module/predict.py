@@ -15,7 +15,7 @@ st.write("Enter study hours to predict marks")
 enter = st.number_input("Enter Hours Studied", min_value=0.0)
 
 if st.button("Predict"):
-    prediction = load_model.predict(np.array([[hours]]))
+    prediction = load_model.predict(np.array([[enter]]))
     st.success(f"Prediction Marks: {prediction[0]:.2f}")
 
 # # Load model
